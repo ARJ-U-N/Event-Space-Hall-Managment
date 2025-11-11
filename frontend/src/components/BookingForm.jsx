@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { API_URL } from '../config'; 
 import '../styles/BookingForm.css';
+
 
 const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
   const [formData, setFormData] = useState({
@@ -17,12 +19,14 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
   const [user, setUser] = useState({ name: 'SWIPE' });
   const [timeError, setTimeError] = useState('');
 
+
   const submitBooking = async (bookingData) => {
     const token = localStorage.getItem('token');
     
     console.log('Submitting booking data:', bookingData); 
     
-    const response = await fetch('http://localhost:5000/api/bookings', {
+    
+    const response = await fetch(`${API_URL}/api/bookings`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,34 +43,42 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
     return response.json();
   };
 
+
   const validateTimeSlot = (startTime, endTime) => {
     if (!startTime || !endTime) return '';
+
 
     const timeToMinutes = (timeStr) => {
       const [hours, minutes] = timeStr.split(':').map(Number);
       return hours * 60 + minutes;
     };
 
+
     const startMinutes = timeToMinutes(startTime);
     const endMinutes = timeToMinutes(endTime);
     const operatingStart = 7 * 60;
     const operatingEnd = 18 * 60;
 
+
     if (startMinutes < operatingStart || endMinutes > operatingEnd) {
       return 'Booking time must be between 7:00 AM and 6:00 PM';
     }
 
+
     if (endMinutes <= startMinutes) {
       return 'End time must be after start time';
     }
+
 
     const durationMinutes = endMinutes - startMinutes;
     if (durationMinutes < 60) {
       return 'Minimum booking duration is 1 hour';
     }
 
+
     return '';
   };
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -76,12 +88,14 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
       [name]: type === 'checkbox' ? checked : value
     }));
 
+
     if (name === 'startTime' || name === 'endTime') {
       const newFormData = { ...formData, [name]: value };
       const error = validateTimeSlot(newFormData.startTime, newFormData.endTime);
       setTimeError(error);
     }
   };
+
 
   const handleToggleChange = (field) => {
     setFormData(prev => ({
@@ -90,6 +104,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
     }));
   };
 
+
   const getDurationText = () => {
     if (!formData.startTime || !formData.endTime) return '';
     
@@ -97,6 +112,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
       const [hours, minutes] = timeStr.split(':').map(Number);
       return hours * 60 + minutes;
     };
+
 
     const startMinutes = timeToMinutes(formData.startTime);
     const endMinutes = timeToMinutes(formData.endTime);
@@ -112,6 +128,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
     return `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minutes`;
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -121,7 +138,9 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
       return;
     }
 
+
     setLoading(true);
+
 
     try {
       const bookingData = {
@@ -140,9 +159,11 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
         notes: formData.notes || ''
       };
 
+
       console.log('Selected Hall:', selectedHall); 
       console.log('Form Data:', formData); 
       console.log('Final Booking Data:', bookingData); 
+
 
       const response = await submitBooking(bookingData);
       console.log('Booking Response:', response); 
@@ -162,11 +183,13 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
     }
   };
 
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.reload();
   };
+
 
   return (
     <div className="booking-form-container">
@@ -201,6 +224,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
         </nav>
       </div>
 
+
       <div className="main-content">
         <div className="header">
           <div className="search-container">
@@ -217,6 +241,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
             <span className="username">{user.name}</span>
           </div>
         </div>
+
 
         <div className="hall-hero">
           <div className="hall-hero-background">
@@ -239,10 +264,12 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
           </div>
         </div>
 
+
         <div className="booking-form-section">
           <div className="operating-hours-info">
             <p>Operating Hours: 7:00 AM - 6:00 PM | Minimum Duration: 1 hour | Buffer Time: 1 hour between bookings</p>
           </div>
+
 
           <form onSubmit={handleSubmit} className="booking-form">
             <div className="form-row">
@@ -258,6 +285,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
                   required
                 />
               </div>
+
 
               <div className="form-group">
                 <label htmlFor="numberOfSeats">Number of Seats</label>
@@ -278,6 +306,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
               </div>
             </div>
 
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="startTime">Start Time</label>
@@ -292,6 +321,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
                   required
                 />
               </div>
+
 
               <div className="form-group">
                 <label htmlFor="endTime">End Time</label>
@@ -308,6 +338,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
               </div>
             </div>
 
+
             {formData.startTime && formData.endTime && !timeError && (
               <div className="duration-display">
                 <span className="duration-label">Duration: </span>
@@ -315,11 +346,13 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
               </div>
             )}
 
+
             {timeError && (
               <div className="time-error">
                 {timeError}
               </div>
             )}
+
 
             <div className="form-row">
               <div className="form-group full-width">
@@ -338,6 +371,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
               </div>
             </div>
 
+
             <div className="form-row">
               <div className="form-group">
                 <div className="toggle-group">
@@ -350,6 +384,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
                   </div>
                 </div>
               </div>
+
 
               <div className="form-group">
                 <div className="toggle-group">
@@ -364,6 +399,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
               </div>
             </div>
 
+
             <div className="form-row">
               <div className="form-group">
                 <div className="toggle-group">
@@ -377,6 +413,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
                 </div>
               </div>
             </div>
+
 
             <div className="form-row">
               <div className="form-group full-width">
@@ -396,6 +433,7 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
               </div>
             </div>
 
+
             <button 
               type="submit" 
               className="book-now-btn"
@@ -410,5 +448,6 @@ const BookingForm = ({ onNavigate, selectedHall, selectedDate }) => {
     </div>
   );
 };
+
 
 export default BookingForm;

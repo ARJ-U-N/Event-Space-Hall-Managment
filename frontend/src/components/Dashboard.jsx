@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config'; 
 import '../styles/Dashboard.css';
+
 
 const Dashboard = ({ onNavigate }) => {
   const [halls, setHalls] = useState([]);
@@ -7,15 +9,18 @@ const Dashboard = ({ onNavigate }) => {
   const [user, setUser] = useState({ name: 'SWIPE' });
   const [loading, setLoading] = useState(true);
 
+
   const fetchHalls = async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/halls', {
+    
+    const response = await fetch(`${API_URL}/api/halls`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
     });
     return response.json();
   };
+
 
   useEffect(() => {
     const loadHalls = async () => {
@@ -29,12 +34,15 @@ const Dashboard = ({ onNavigate }) => {
       }
     };
 
+
     loadHalls();
   }, []);
+
 
   const handleBook = (hall) => {
     onNavigate('booking', hall);
   };
+
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -42,10 +50,12 @@ const Dashboard = ({ onNavigate }) => {
     window.location.reload();
   };
 
+
   const filteredHalls = halls.filter(hall =>
     hall.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     hall.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   return (
     <div className="dashboard-container">
@@ -79,6 +89,7 @@ const Dashboard = ({ onNavigate }) => {
         </nav>
       </div>
 
+
       <div className="main-content">
         <div className="header">
           <div className="search-container">
@@ -98,10 +109,12 @@ const Dashboard = ({ onNavigate }) => {
           </div>
         </div>
 
+
         <div className="welcome-section">
           <h1>Hello {user.name}!</h1>
           <p>Book your hall now</p>
         </div>
+
 
       
         <div className="halls-grid">
@@ -142,5 +155,6 @@ const Dashboard = ({ onNavigate }) => {
     </div>
   );
 };
+
 
 export default Dashboard;

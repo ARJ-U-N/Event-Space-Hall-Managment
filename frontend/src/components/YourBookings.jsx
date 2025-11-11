@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';  
 import '../styles/YourBookings.css';
+
 
 const YourBookings = ({ onNavigate }) => {
   const [bookings, setBookings] = useState([]);
   const [user, setUser] = useState({ name: 'SWIPE' });
   const [loading, setLoading] = useState(true);
 
+
   const fetchBookings = async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/bookings', {
+    
+    const response = await fetch(`${API_URL}/api/bookings`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
     });
     return response.json();
   };
+
 
   const editBooking = async (bookingId) => {
     return new Promise((resolve) => {
@@ -24,9 +29,11 @@ const YourBookings = ({ onNavigate }) => {
     });
   };
 
+
   const cancelBooking = async (bookingId) => {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/bookings/${bookingId}`, {
+    
+    const response = await fetch(`${API_URL}/api/bookings/${bookingId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -34,6 +41,7 @@ const YourBookings = ({ onNavigate }) => {
     });
     return response.json();
   };
+
 
   useEffect(() => {
     const loadBookings = async () => {
@@ -47,8 +55,10 @@ const YourBookings = ({ onNavigate }) => {
       }
     };
 
+
     loadBookings();
   }, []);
+
 
   const handleEdit = async (bookingId, hallName) => {
     try {
@@ -58,6 +68,7 @@ const YourBookings = ({ onNavigate }) => {
       alert('Error opening edit form. Please try again.');
     }
   };
+
 
   const handleCancel = async (bookingId, hallName) => {
     const confirmed = window.confirm(`Are you sure you want to cancel the ${hallName} booking?`);
@@ -72,11 +83,13 @@ const YourBookings = ({ onNavigate }) => {
     }
   };
 
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.reload();
   };
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -86,6 +99,7 @@ const YourBookings = ({ onNavigate }) => {
       year: 'numeric'
     });
   };
+
 
   const formatDuration = (booking) => {
     if (booking.startTime && booking.endTime) {
@@ -103,6 +117,7 @@ const YourBookings = ({ onNavigate }) => {
     return durationMap[booking.duration] || booking.duration;
   };
 
+
   const calculateBookingDuration = (startTime, endTime) => {
     if (!startTime || !endTime) return '';
     
@@ -110,6 +125,7 @@ const YourBookings = ({ onNavigate }) => {
       const [hours, minutes] = timeStr.split(':').map(Number);
       return hours * 60 + minutes;
     };
+
 
     const startMinutes = timeToMinutes(startTime);
     const endMinutes = timeToMinutes(endTime);
@@ -124,6 +140,7 @@ const YourBookings = ({ onNavigate }) => {
     if (minutes === 0) return `${hours}h`;
     return `${hours}h ${minutes}min`;
   };
+
 
   return (
     <div className="bookings-container">
@@ -158,6 +175,7 @@ const YourBookings = ({ onNavigate }) => {
         </nav>
       </div>
 
+
       <div className="main-content">
         <div className="header">
           <div className="search-container">
@@ -175,10 +193,12 @@ const YourBookings = ({ onNavigate }) => {
           </div>
         </div>
 
+
         <div className="page-title">
           <div className="title-accent"></div>
           <h1>YOUR BOOKINGS</h1>
         </div>
+
 
         <div className="bookings-grid">
           {loading ? (
@@ -268,5 +288,6 @@ const YourBookings = ({ onNavigate }) => {
     </div>
   );
 };
+
 
 export default YourBookings;

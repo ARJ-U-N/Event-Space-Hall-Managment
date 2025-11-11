@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';  
 import '../styles/BookingCalendar.css';
+
 
 const BookingCalendar = ({ onNavigate, selectedHall }) => {
   const [selectedDate, setSelectedDate] = useState(new Date(2025, 8, 16)); 
@@ -8,17 +10,21 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
   const [dayAvailability, setDayAvailability] = useState({});
   const [user, setUser] = useState({ name: 'SWIPE' });
 
+
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
+
 
   const monthNames = [
     'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
     'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
   ];
 
+
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 
   // Updated to handle new API response structure
   const fetchDetailedAvailability = async (date, hallId) => {
@@ -26,7 +32,8 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
     const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings/availability/${hallId}/${dateStr}`, {
+      
+      const response = await fetch(`${API_URL}/api/bookings/availability/${hallId}/${dateStr}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -40,8 +47,10 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
       console.log('API error, using mock data');
     }
 
+
     return null;
   };
+
 
   useEffect(() => {
     const loadAvailability = async () => {
@@ -56,16 +65,20 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
       }
     };
 
+
     loadAvailability();
   }, [selectedDate, selectedHall]);
+
 
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate();
   };
 
+
   const getFirstDayOfMonth = (month, year) => {
     return new Date(year, month, 1).getDay();
   };
+
 
   const handleDateClick = async (day) => {
     const newDate = new Date(currentYear, currentMonth, day);
@@ -82,9 +95,11 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
     }
   };
 
+
   const handleMonthChange = (month) => {
     setCurrentMonth(month);
   };
+
 
   const handleYearChange = (direction) => {
     if (direction === 'prev') {
@@ -94,9 +109,11 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
     }
   };
 
+
   const handleBookSlot = (availableSlot = null) => {
     onNavigate('bookingform', selectedHall, selectedDate, availableSlot);
   };
+
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -104,15 +121,18 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
     window.location.reload();
   };
 
+
   const renderCalendarDays = () => {
     const daysInMonth = getDaysInMonth(currentMonth, currentYear);
     const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
     const days = [];
 
+
     // Empty cells for days before month starts
     for (let i = 0; i < firstDay; i++) {
       days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
     }
+
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentYear, currentMonth, day);
@@ -126,6 +146,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
       const hasBookings = dayData && dayData.totalBookings > 0;
       const hasAvailableSlots = dayData && dayData.availableSlots && dayData.availableSlots.length > 0;
       const isFullyBooked = hasBookings && !hasAvailableSlots;
+
 
       days.push(
         <div
@@ -143,8 +164,10 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
       );
     }
 
+
     return days;
   };
+
 
   const formatSelectedDate = () => {
     return selectedDate.toLocaleDateString('en-US', {
@@ -154,6 +177,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
     }).toUpperCase();
   };
 
+
   const formatTimeRange = (startTime, endTime) => {
     const formatTime = (time) => {
       const [hours, minutes] = time.split(':');
@@ -162,10 +186,13 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
       return `${hour12}:${minutes} ${ampm}`;
     };
 
+
     return `${formatTime(startTime)} - ${formatTime(endTime)}`;
   };
 
+
   const currentAvailability = dayAvailability[selectedDate.toDateString()];
+
 
   return (
     <div className="booking-calendar-container">
@@ -199,6 +226,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
         </nav>
       </div>
 
+
       {/* Main Content */}
       <div className="main-content">
         {/* Header */}
@@ -217,6 +245,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
             <span className="username">{user.name}</span>
           </div>
         </div>
+
 
         {/* Calendar Section */}
         <div className="calendar-section">
@@ -252,6 +281,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
             </div>
           </div>
 
+
           {/* Calendar Panel */}
           <div className="calendar-panel">
             <div className="calendar-header">
@@ -269,6 +299,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
               </div>
             </div>
           </div>
+
 
           {/* Updated Date Info Panel */}
           <div className="date-info-panel">
@@ -288,6 +319,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
                   <small>Operating Hours: 7:00 AM - 6:00 PM</small>
                   <small>Buffer Time: 1 hour between bookings</small>
                 </div>
+
 
                 {/* Current Bookings */}
                 {currentAvailability && currentAvailability.bookings && currentAvailability.bookings.length > 0 ? (
@@ -310,6 +342,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
                   </div>
                 )}
 
+
                 {/* Available Time Slots */}
                 {currentAvailability && currentAvailability.availableSlots && currentAvailability.availableSlots.length > 0 && (
                   <div className="available-slots">
@@ -327,6 +360,7 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
                     </div>
                   </div>
                 )}
+
 
                 {/* Book Now Button */}
                 {currentAvailability && currentAvailability.availableSlots && currentAvailability.availableSlots.length > 0 ? (
@@ -359,5 +393,6 @@ const BookingCalendar = ({ onNavigate, selectedHall }) => {
     </div>
   );
 };
+
 
 export default BookingCalendar;

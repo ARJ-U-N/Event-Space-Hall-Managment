@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { API_URL } from '../config';  
 import '../styles/LoginPage.css';
+
 
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -9,6 +11,7 @@ const LoginPage = ({ onLogin }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,6 +25,7 @@ const LoginPage = ({ onLogin }) => {
     }
   };
 
+
   const loginAPI = async (credentials) => {
     console.log('Making login API request with:', {
       email: credentials.email,
@@ -29,7 +33,8 @@ const LoginPage = ({ onLogin }) => {
       password: '***' // Don't log actual password
     });
 
-    const response = await fetch('http://localhost:5000/api/auth/login', {
+    
+    const response = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,10 +56,12 @@ const LoginPage = ({ onLogin }) => {
     return responseData;
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
 
     console.log('=== LOGIN ATTEMPT ===');
     console.log('Form data:', {
@@ -62,6 +69,7 @@ const LoginPage = ({ onLogin }) => {
       role: formData.role,
       password: formData.password ? '***' : 'empty'
     });
+
 
     // Client-side validation
     if (!formData.email || !formData.password || !formData.role) {
@@ -77,6 +85,7 @@ const LoginPage = ({ onLogin }) => {
       return;
     }
 
+
     try {
       console.log('Making API call...');
       const response = await loginAPI(formData);
@@ -86,6 +95,7 @@ const LoginPage = ({ onLogin }) => {
         console.error('Invalid API response structure:', response);
         throw new Error('Invalid response from server');
       }
+
 
       const { user: userData, token } = response.data;
       
@@ -98,6 +108,7 @@ const LoginPage = ({ onLogin }) => {
         throw new Error('Invalid user data received from server');
       }
 
+
       // Validate role matches selection
       if (userData.role !== formData.role) {
         console.error('Role mismatch:', {
@@ -106,6 +117,7 @@ const LoginPage = ({ onLogin }) => {
         });
         throw new Error(`Role mismatch. You selected ${formData.role} but server returned ${userData.role}`);
       }
+
 
       console.log('Storing authentication data...');
       
@@ -166,6 +178,7 @@ const LoginPage = ({ onLogin }) => {
     }
   };
 
+
   // Get role-specific subtitle
   const getRoleSubtitle = () => {
     switch (formData.role) {
@@ -180,6 +193,7 @@ const LoginPage = ({ onLogin }) => {
     }
   };
 
+
   // Get role-specific placeholder text
   const getRolePlaceholder = () => {
     switch (formData.role) {
@@ -193,6 +207,7 @@ const LoginPage = ({ onLogin }) => {
         return 'email@domain.com';
     }
   };
+
 
   return (
     <div className="login-container">
@@ -241,6 +256,7 @@ const LoginPage = ({ onLogin }) => {
         )}
       </div>
 
+
       {/* Right Side - Login Form */}
       <div className="login-right">
         <div className="login-form-container">
@@ -272,6 +288,7 @@ const LoginPage = ({ onLogin }) => {
               </select>
             </div>
 
+
             {/* Email Field */}
             <div className="form-group">
               <label htmlFor="email">
@@ -293,6 +310,7 @@ const LoginPage = ({ onLogin }) => {
               />
             </div>
 
+
             {/* Password Field */}
             <div className="form-group">
               <label htmlFor="password">
@@ -312,6 +330,7 @@ const LoginPage = ({ onLogin }) => {
               />
             </div>
 
+
             {/* Error Message */}
             {error && (
               <div className="error-message">
@@ -319,6 +338,7 @@ const LoginPage = ({ onLogin }) => {
                 {error}
               </div>
             )}
+
 
             {/* Debug Info (only in development) */}
             {process.env.NODE_ENV === 'development' && (
@@ -335,6 +355,7 @@ const LoginPage = ({ onLogin }) => {
                 Loading: {loading ? 'yes' : 'no'}
               </div>
             )}
+
 
             {/* Submit Button */}
             <button 
@@ -357,6 +378,7 @@ const LoginPage = ({ onLogin }) => {
               )}
             </button>
           </form>
+
 
           {/* Footer Information */}
           <div className="login-footer">
@@ -422,5 +444,6 @@ const LoginPage = ({ onLogin }) => {
     </div>
   );
 };
+
 
 export default LoginPage;

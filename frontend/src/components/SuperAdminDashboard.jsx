@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';  
 import '../styles/SuperAdminDashboard.css';
+
 
 const SuperAdminDashboard = ({ onLogout }) => {
   const [user, setUser] = useState(null);
@@ -10,6 +12,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
 
+
   const [createForm, setCreateForm] = useState({
     name: '',
     email: '',
@@ -19,6 +22,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
     phone: ''
   });
 
+
   const [editForm, setEditForm] = useState({
     name: '',
     email: '',
@@ -26,8 +30,10 @@ const SuperAdminDashboard = ({ onLogout }) => {
     phone: ''
   });
 
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterActive, setFilterActive] = useState('all'); // all, active, inactive
+
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -37,10 +43,12 @@ const SuperAdminDashboard = ({ onLogout }) => {
     loadAdmins();
   }, []);
 
+
   const loadAdmins = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/api/superadmin/admins', {
+      
+      const response = await fetch(`${API_URL}/api/superadmin/admins`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -54,6 +62,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
     }
   };
 
+
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
     
@@ -62,10 +71,13 @@ const SuperAdminDashboard = ({ onLogout }) => {
       return;
     }
 
+
     const token = localStorage.getItem('token');
 
+
     try {
-      const response = await fetch('http://localhost:5000/api/superadmin/admins', {
+      
+      const response = await fetch(`${API_URL}/api/superadmin/admins`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,6 +91,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
           phone: createForm.phone
         })
       });
+
 
       const data = await response.json();
       
@@ -103,12 +116,15 @@ const SuperAdminDashboard = ({ onLogout }) => {
     }
   };
 
+
   const handleEditAdmin = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
 
+
     try {
-      const response = await fetch(`http://localhost:5000/api/superadmin/admins/${selectedAdmin._id}`, {
+      
+      const response = await fetch(`${API_URL}/api/superadmin/admins/${selectedAdmin._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -116,6 +132,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
         },
         body: JSON.stringify(editForm)
       });
+
 
       const data = await response.json();
       
@@ -133,17 +150,21 @@ const SuperAdminDashboard = ({ onLogout }) => {
     }
   };
 
+
   const handleToggleAdminStatus = async (admin, action) => {
     const token = localStorage.getItem('token');
     const endpoint = action === 'deactivate' ? 'deactivate' : 'reactivate';
 
+
     try {
-      const response = await fetch(`http://localhost:5000/api/superadmin/admins/${admin._id}/${endpoint}`, {
+      
+      const response = await fetch(`${API_URL}/api/superadmin/admins/${admin._id}/${endpoint}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
+
 
       const data = await response.json();
       
@@ -159,6 +180,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
     }
   };
 
+
   const openEditModal = (admin) => {
     setSelectedAdmin(admin);
     setEditForm({
@@ -169,6 +191,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
     });
     setShowEditModal(true);
   };
+
 
   const filteredAdmins = admins.filter(admin => {
     const matchesSearch = admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -182,14 +205,17 @@ const SuperAdminDashboard = ({ onLogout }) => {
     return matchesSearch && matchesFilter;
   });
 
+
   const getStats = () => {
     const totalAdmins = admins.length;
     const activeAdmins = admins.filter(admin => admin.isActive).length;
     const inactiveAdmins = totalAdmins - activeAdmins;
     const departments = [...new Set(admins.map(admin => admin.department).filter(Boolean))].length;
 
+
     return { totalAdmins, activeAdmins, inactiveAdmins, departments };
   };
+
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-GB', {
@@ -199,11 +225,14 @@ const SuperAdminDashboard = ({ onLogout }) => {
     });
   };
 
+
   if (loading) {
     return <div className="loading">Loading super admin dashboard...</div>;
   }
 
+
   const stats = getStats();
+
 
   return (
     <div className="superadmin-dashboard">
@@ -236,6 +265,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
         </div>
       </div>
 
+
       {/* Navigation */}
       <div className="nav-tabs">
         <button 
@@ -267,6 +297,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
           Settings
         </button>
       </div>
+
 
       {/* Content */}
       <div className="dashboard-content">
@@ -304,6 +335,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 </div>
               </div>
             </div>
+
 
             {/* Recent Admins */}
             <div className="section">
@@ -355,6 +387,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
               </div>
             </div>
 
+
             {/* System Info */}
             <div className="section">
               <h3>System Information</h3>
@@ -375,6 +408,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
             </div>
           </div>
         )}
+
 
         {/* Admins Management Tab */}
         {activeTab === 'admins' && (
@@ -408,6 +442,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 </button>
               </div>
             </div>
+
 
             {/* Admins Table */}
             <div className="admins-table">
@@ -482,6 +517,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
           </div>
         )}
 
+
         {/* Create Admin Tab */}
         {activeTab === 'create' && (
           <div className="create-admin">
@@ -490,6 +526,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 <h3>Create New Hall Administrator</h3>
                 <p>Add a new administrator to manage halls and booking requests</p>
               </div>
+
 
               <form onSubmit={handleCreateAdmin} className="create-form">
                 <div className="form-row">
@@ -515,6 +552,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                     />
                   </div>
                 </div>
+
 
                 <div className="form-row">
                   <div className="form-group">
@@ -542,6 +580,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                   </div>
                 </div>
 
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>Department</label>
@@ -563,6 +602,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                     />
                   </div>
                 </div>
+
 
                 <div className="form-actions">
                   <button 
@@ -588,6 +628,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
           </div>
         )}
 
+
         {/* Profile/Settings Tab */}
         {activeTab === 'profile' && (
           <div className="profile-settings">
@@ -600,6 +641,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                   <p className="department">{user?.department}</p>
                 </div>
               </div>
+
 
               <div className="profile-details">
                 <div className="detail-card">
@@ -625,6 +667,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                     </div>
                   </div>
                 </div>
+
 
                 <div className="detail-card">
                   <h4>System Permissions</h4>
@@ -661,6 +704,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
         )}
       </div>
 
+
       {/* Create Admin Modal */}
       {showCreateModal && (
         <div className="modal-overlay">
@@ -674,6 +718,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 ×
               </button>
             </div>
+
 
             <form onSubmit={handleCreateAdmin} className="modal-form">
               <div className="form-group">
@@ -697,6 +742,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                   placeholder="admin@example.com"
                 />
               </div>
+
 
               <div className="form-row">
                 <div className="form-group">
@@ -724,6 +770,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 </div>
               </div>
 
+
               <div className="form-row">
                 <div className="form-group">
                   <label>Department</label>
@@ -746,6 +793,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 </div>
               </div>
 
+
               <div className="modal-actions">
                 <button 
                   type="button" 
@@ -763,6 +811,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
         </div>
       )}
 
+
       {/* Edit Admin Modal */}
       {showEditModal && selectedAdmin && (
         <div className="modal-overlay">
@@ -776,6 +825,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 ×
               </button>
             </div>
+
 
             <form onSubmit={handleEditAdmin} className="modal-form">
               <div className="form-group">
@@ -800,6 +850,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 />
               </div>
 
+
               <div className="form-row">
                 <div className="form-group">
                   <label>Department</label>
@@ -822,6 +873,7 @@ const SuperAdminDashboard = ({ onLogout }) => {
                 </div>
               </div>
 
+
               <div className="modal-actions">
                 <button 
                   type="button" 
@@ -841,5 +893,6 @@ const SuperAdminDashboard = ({ onLogout }) => {
     </div>
   );
 };
+
 
 export default SuperAdminDashboard;

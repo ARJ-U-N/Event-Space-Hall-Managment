@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/AdminDashboard.css';
+import { API_URL } from '../config'; 
 
 const AdminDashboard = ({ onLogout }) => {
   const [user, setUser] = useState(null);
@@ -98,7 +99,7 @@ const AdminDashboard = ({ onLogout }) => {
   const loadDashboard = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+      const response = await fetch(`${API_URL}/api/admin/dashboard`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -113,7 +114,7 @@ const AdminDashboard = ({ onLogout }) => {
   const loadPendingRequests = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/api/admin/pending-requests', {
+      const response = await fetch(`${API_URL}/api/admin/pending-requests`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -128,7 +129,7 @@ const AdminDashboard = ({ onLogout }) => {
   const loadMyHalls = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/api/admin/my-halls', {
+      const response = await fetch(`${API_URL}/api/admin/my-halls`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -176,7 +177,7 @@ const AdminDashboard = ({ onLogout }) => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/halls/${selectedHall._id}`, {
+      const response = await fetch(`${API_URL}/api/admin/halls/${selectedHall._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -211,7 +212,7 @@ const AdminDashboard = ({ onLogout }) => {
     const token = localStorage.getItem('token');
     try {
       // Fetch all requests for this specific hall
-      const response = await fetch(`http://localhost:5000/api/admin/my-hall-requests?hallId=${hall._id}`, {
+      const response = await fetch(`${API_URL}/api/admin/my-hall-requests?hallId=${hall._id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -246,7 +247,7 @@ const AdminDashboard = ({ onLogout }) => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/booking-request/${selectedRequest._id}/respond`, {
+      const response = await fetch(`${API_URL}/api/admin/booking-request/${selectedRequest._id}/respond`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -275,7 +276,7 @@ const AdminDashboard = ({ onLogout }) => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch('http://localhost:5000/api/admin/halls', {
+      const response = await fetch(`${API_URL}/api/admin/halls`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
