@@ -70,6 +70,6 @@ const hallSchema = new mongoose.Schema({
 
 // Index for efficient queries
 hallSchema.index({ createdBy: 1, isActive: 1 });
-hallSchema.index({ number: 1 });
+
 
 module.exports = mongoose.model('Hall', hallSchema);
