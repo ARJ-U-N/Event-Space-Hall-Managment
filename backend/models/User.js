@@ -17,9 +17,14 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
+    required: [
+      function () { return !this.googleId; },
+      'Please provide a password'
+    ],
     minLength: [6, 'Password must be at least 6 characters']
   },
+  googleId: String,
+  picture: String,
   role: {
     type: String,
     enum: ['teacher', 'admin', 'superadmin'], // ADDED superadmin role
@@ -42,17 +47,18 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || !this.password) {
     next();
+    return;
   }
-  
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(enteredPassword) {
+userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

@@ -1,10 +1,99 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE
   });
+};
+
+const googleLogin = async (req, res) => {
+  try {
+    const { token, role } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    const { email, name, picture, sub: googleId } = ticket.getPayload();
+
+    if (!email.endsWith('@nirmalacollege.edu.in')) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only nirmalacollege.edu.in email addresses are allowed'
+      });
+    }
+
+    // Force role to be 'teacher' for Google Auth
+    const enforcedRole = 'teacher';
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.picture = picture;
+        // Update role if it's not teacher? Or just allow? 
+        // Requirement: "only teacher should sign in with gmail". 
+        // If an admin tries to sign in with Gmail, should we allow it?
+        // Based on "if superadmin show super admin login... only teacher should sign in with gmail",
+        // it implies Google Auth is FOR Teachers. 
+        // If an existing admin tries to use Google Auth, we should probably BLOCK it or convert them?
+        // Safer to BLOCK if role mismatch.
+        if (user.role !== enforcedRole) {
+          return res.status(403).json({
+            success: false,
+            message: 'Google Sign-In is restricted to Teachers only.'
+          });
+        }
+        await user.save();
+      }
+    } else {
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        picture,
+        role: enforcedRole,
+        password: '',
+        isActive: true
+      });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been deactivated.'
+      });
+    }
+
+    const jwtToken = generateToken(user._id);
+
+    res.json({
+      success: true,
+      data: {
+        token: jwtToken,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          department: user.department,
+          picture: user.picture
+        }
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
 };
 
 const register = async (req, res) => {
@@ -135,5 +224,6 @@ const getMe = async (req, res) => {
 module.exports = {
   register,
   login,
-  getMe
+  getMe,
+  googleLogin
 };
