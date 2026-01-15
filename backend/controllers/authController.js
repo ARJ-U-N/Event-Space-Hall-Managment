@@ -59,7 +59,7 @@ const googleLogin = async (req, res) => {
         googleId,
         picture,
         role: enforcedRole,
-        password: '',
+        role: enforcedRole,
         isActive: true
       });
     }
