@@ -21,7 +21,7 @@ const googleLogin = async (req, res) => {
 
     const { email, name, picture, sub: googleId } = ticket.getPayload();
 
-    i// Updated logic to allow your personal email for testing
+    // Updated logic to allow your personal email for testing
     const allowedTestEmails = ['omnipresent724@gmail.com'];
 
     if (!email.endsWith('@nirmalacollege.edu.in') && !allowedTestEmails.includes(email)) {
