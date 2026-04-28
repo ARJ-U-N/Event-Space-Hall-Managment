@@ -69,13 +69,116 @@
 .rpt-s-rejected  { background: linear-gradient(135deg, #5c1a1a 0%, #8b2a2a 100%); border: 1px solid #8b2a2a; }
 .rpt-s-cancelled { background: linear-gradient(135deg, #2d2d3f 0%, #3d3d52 100%); border: 1px solid #4a4a60; }
 
-/* ── Filter row ─────────────────────────────────────────────────────────────── */
+/* ── Filter rows ─────────────────────────────────────────────────────────────── */
 .rpt-filters {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
   flex-wrap: wrap;
 }
+
+.rpt-row1 { flex-wrap: nowrap; }
+@media (max-width: 768px) { .rpt-row1 { flex-wrap: wrap; } }
+
+/* ── Advanced toggle button ──────────────────────────────────────────────────── */
+.rpt-adv-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border: 1.5px solid #3a4a6a;
+  border-radius: 8px;
+  background: transparent;
+  color: #a0aec0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+.rpt-adv-toggle:hover        { border-color: #5b7fcb; color: #e2e8f0; }
+.rpt-adv-toggle.has-filters  { border-color: #5b7fcb; color: #93c5fd; background: rgba(91,127,203,0.12); }
+.rpt-adv-caret { font-size: 0.7rem; transition: transform 0.2s; }
+.rpt-adv-caret.open { transform: rotate(180deg); }
+
+/* ── Advanced filter bar ─────────────────────────────────────────────────────── */
+.rpt-adv-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.1rem;
+  background: #0f1928;
+  border: 1px solid #2a3a56;
+  border-radius: 10px;
+  animation: rptFadeIn 0.2s ease;
+}
+
+.rpt-adv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+
+.rpt-adv-field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #6b8cca;
+}
+
+/* Select dropdowns */
+.rpt-select {
+  padding: 0.46rem 0.8rem;
+  border-radius: 8px;
+  border: 1.5px solid #3a4a6a;
+  background: #1a2438;
+  color: #e2e8f0;
+  font-size: 0.87rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.18s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b8cca' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  padding-right: 2rem;
+}
+.rpt-select:focus { border-color: #5b7fcb; }
+.rpt-select option { background: #1a2438; }
+
+/* Date inputs */
+.rpt-date-inp {
+  padding: 0.46rem 0.8rem;
+  border-radius: 8px;
+  border: 1.5px solid #3a4a6a;
+  background: #1a2438;
+  color: #e2e8f0;
+  font-size: 0.87rem;
+  outline: none;
+  transition: border-color 0.18s;
+  color-scheme: dark;
+}
+.rpt-date-inp:focus { border-color: #5b7fcb; }
+
+/* Clear all */
+.rpt-clear-all-btn {
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid #e05252;
+  border-radius: 8px;
+  background: transparent;
+  color: #e05252;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.rpt-clear-all-btn:hover { background: #e05252; color: #fff; }
 
 /* Timeframe buttons */
 .rpt-tf-group { display: flex; gap: 0.4rem; }
