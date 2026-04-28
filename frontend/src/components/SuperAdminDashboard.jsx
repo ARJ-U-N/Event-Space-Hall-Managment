@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config';  
 import '../styles/SuperAdminDashboard.css';
+import Reports from './Reports';
 
 
 const SuperAdminDashboard = ({ onLogout }) => {
@@ -288,6 +289,13 @@ const SuperAdminDashboard = ({ onLogout }) => {
         >
           <span className="tab-icon">➕</span>
           Create Admin
+        </button>
+        <button 
+          className={`tab ${activeTab === 'reports' ? 'active' : ''}`}
+          onClick={() => setActiveTab('reports')}
+        >
+          <span className="tab-icon">📈</span>
+          Reports
         </button>
         <button 
           className={`tab ${activeTab === 'profile' ? 'active' : ''}`}
@@ -702,6 +710,9 @@ const SuperAdminDashboard = ({ onLogout }) => {
             </div>
           </div>
         )}
+
+        {/* Reports Tab */}
+        {activeTab === 'reports' && <Reports />}
       </div>
 
 

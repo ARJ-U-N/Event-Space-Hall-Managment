@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/AdminDashboard.css';
-import { API_URL } from '../config'; 
+import { API_URL } from '../config';
+import Reports from './Reports';
 
 const AdminDashboard = ({ onLogout }) => {
   const [user, setUser] = useState(null);
@@ -394,6 +395,13 @@ const AdminDashboard = ({ onLogout }) => {
             <span className="nav-icon">➕</span>
             <span>Create Hall</span>
           </div>
+          <div 
+            className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reports')}
+          >
+            <span className="nav-icon">📈</span>
+            <span>Reports</span>
+          </div>
           <div className="nav-item logout" onClick={onLogout}>
             <span className="nav-icon">🚪</span>
             <span>Logout</span>
@@ -407,9 +415,10 @@ const AdminDashboard = ({ onLogout }) => {
         <div className="content-header">
           <h1>
             {activeTab === 'dashboard' && 'Dashboard Overview'}
-            {activeTab === 'pending' && 'Pending Requests'}
-            {activeTab === 'halls' && 'My Halls'}
-            {activeTab === 'create' && 'Create New Hall'}
+            {activeTab === 'pending'   && 'Pending Requests'}
+            {activeTab === 'halls'    && 'My Halls'}
+            {activeTab === 'create'   && 'Create New Hall'}
+            {activeTab === 'reports'  && 'Reports & Analytics'}
           </h1>
           <div className="user-profile">
             <span>Welcome, {user?.name}</span>
@@ -800,6 +809,9 @@ const AdminDashboard = ({ onLogout }) => {
             </div>
           </div>
         )}
+
+        {/* Reports Tab */}
+        {activeTab === 'reports' && <Reports />}
       </div>
 
       {/* Approval Modal */}

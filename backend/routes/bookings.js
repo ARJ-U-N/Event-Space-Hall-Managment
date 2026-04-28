@@ -8,7 +8,8 @@ const {
   cancelBooking,
   getHallAvailability
 } = require('../controllers/bookingController');
-const { auth } = require('../middleware/auth');
+const { getReports } = require('../controllers/reportController');
+const { auth, authorize } = require('../middleware/auth');
 const { handleValidationErrors } = require('../middleware/validation');
 
 const router = express.Router();
@@ -86,6 +87,9 @@ const bookingValidation = [
 router.route('/')
   .get(auth, getBookings)
   .post(auth, bookingValidation, handleValidationErrors, createBooking);
+
+// Reports route must come BEFORE /:id to avoid "reports" being parsed as a booking ID
+router.get('/reports', auth, authorize('admin', 'superadmin'), getReports);
 
 router.route('/:id')
   .get(auth, getBooking)
