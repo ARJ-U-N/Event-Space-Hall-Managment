@@ -5,7 +5,10 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 
 // Load env vars
-dotenv.config();
+// Load env vars only in development
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 // Connect to database
 connectDB();
@@ -14,7 +17,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
+  origin: process.env.NODE_ENV === 'production'
     ? process.env.FRONTEND_URL || '*'  // Changed: Use env variable
     : ['http://localhost:5000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173'],
   credentials: true,
@@ -48,7 +51,7 @@ app.get('/api/health', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Server Error',
