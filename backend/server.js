@@ -1,10 +1,9 @@
 // server.js
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 
-// 1. Load env vars only in development (Vercel handles production envs natively)
+// 1. Load env vars only in development
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -12,31 +11,22 @@ if (process.env.NODE_ENV !== 'production') {
 // 2. Connect to database
 connectDB();
 
-// 3. Initialize the app BEFORE using middleware or routes
+// 3. Initialize the app
 const app = express();
 
-// 4. The CORS VIP List (Trusting your specific frontend URLs)
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'https://event-space-hall-managment-3xpc.vercel.app', // Your frontend preview URL
-  'https://event-space-hall-managment.vercel.app',      // Your backend production URL
-  'http://localhost:5000',
-  'http://localhost:3001',
-  'http://localhost:3002',
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5173'
-];
-
+// 4. Flexible CORS Logic (The "Dynamic Bouncer")
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
+    // Allow local development
+    const isLocal = !origin || origin.includes('localhost') || origin.includes('127.0.0.1');
 
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+    // Allow ANY Vercel URL that belongs to your project (Fixes the -3xpc / -3xqe issue)
+    const isProjectVercel = origin && origin.includes('event-space-hall-managment');
+
+    if (isLocal || isProjectVercel) {
       callback(null, true);
     } else {
-      console.log("Blocked by CORS: ", origin);
+      console.log("CORS Blocked Origin:", origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -46,8 +36,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// 5. Google OAuth Fix: Cross-Origin-Opener-Policy
-// This allows the Google Sign-in popup to communicate back to your app securely.
+// 5. Google OAuth Security Fix (COOP)
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   next();
@@ -57,7 +46,7 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// 7. Welcome Route (Prevents 404 when visiting the main backend URL)
+// 7. Welcome Route
 app.get('/', (req, res) => {
   res.json({
     success: true,
@@ -74,28 +63,27 @@ app.use('/api/teacher', require('./routes/teacher'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/superadmin', require('./routes/superadmin'));
 
-// 9. Health check endpoint (Used to verify deployment status)
+// 9. Health check
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     message: 'Event Space API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'production'
   });
 });
 
-// 10. Error handling middleware
+// 10. Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
-
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
   });
 });
 
-// 11. 404 handler for undefined routes
+// 11. 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -103,21 +91,18 @@ app.use((req, res) => {
   });
 });
 
+// 12. Local server startup (Vercel ignores this)
 const PORT = process.env.PORT || 5000;
-
-// 12. Only start listening if NOT in production (Vercel handles execution in prod)
 if (process.env.NODE_ENV !== 'production') {
   const server = app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`Server running in development mode on port ${PORT}`);
   });
 
   process.on('unhandledRejection', (err) => {
     console.log(`Error: ${err.message}`);
-    server.close(() => {
-      process.exit(1);
-    });
+    server.close(() => process.exit(1));
   });
 }
 
-// 13. EXPORT FOR VERCEL: Crucial for serverless deployment
+// 13. Export for Vercel
 module.exports = app;
