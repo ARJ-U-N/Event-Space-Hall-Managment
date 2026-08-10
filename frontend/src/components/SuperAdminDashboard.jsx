@@ -182,6 +182,36 @@ const SuperAdminDashboard = ({ onLogout }) => {
   };
 
 
+  const handleDeleteAdmin = async (adminId, adminName) => {
+    if (!window.confirm(`Are you sure you want to permanently delete admin "${adminName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch(`${API_URL}/api/superadmin/admins/${adminId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setAdmins(prevAdmins => prevAdmins.filter(admin => admin._id !== adminId));
+        alert('Admin deleted successfully!');
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Admin delete error:', error);
+      alert('Error deleting admin');
+    }
+  };
+
+
   const openEditModal = (admin) => {
     setSelectedAdmin(admin);
     setEditForm({
@@ -389,6 +419,13 @@ const SuperAdminDashboard = ({ onLogout }) => {
                       >
                         {admin.isActive ? '⏸️' : '▶️'}
                       </button>
+                      <button 
+                        className="delete-btn"
+                        onClick={() => handleDeleteAdmin(admin._id, admin.name)}
+                        title="Delete Admin"
+                      >
+                        🗑️
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -513,6 +550,13 @@ const SuperAdminDashboard = ({ onLogout }) => {
                               title={admin.isActive ? 'Deactivate' : 'Activate'}
                             >
                               {admin.isActive ? '⏸️' : '▶️'}
+                            </button>
+                            <button 
+                              className="delete-btn"
+                              onClick={() => handleDeleteAdmin(admin._id, admin.name)}
+                              title="Delete Admin"
+                            >
+                              🗑️
                             </button>
                           </div>
                         </td>
