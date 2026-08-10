@@ -5,7 +5,8 @@ const {
   createHallAdmin,
   updateHallAdmin,
   deactivateAdmin,
-  reactivateAdmin
+  reactivateAdmin,
+  deleteHallAdmin
 } = require('../controllers/superAdminController');
 const { auth, authorize } = require('../middleware/auth');
 const { handleValidationErrors } = require('../middleware/validation');
@@ -73,5 +74,6 @@ router.post('/admins', auth, authorize('superadmin'), createAdminValidation, han
 router.put('/admins/:adminId', auth, authorize('superadmin'), updateAdminValidation, handleValidationErrors, updateHallAdmin);
 router.put('/admins/:adminId/deactivate', auth, authorize('superadmin'), deactivateAdmin);
 router.put('/admins/:adminId/reactivate', auth, authorize('superadmin'), reactivateAdmin);
+router.delete('/admins/:adminId', auth, authorize('superadmin'), deleteHallAdmin);
 
 module.exports = router;

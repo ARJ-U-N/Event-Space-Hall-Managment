@@ -201,10 +201,46 @@ const reactivateAdmin = async (req, res) => {
   }
 };
 
+// Delete hall admin permanently
+const deleteHallAdmin = async (req, res) => {
+  try {
+    const { adminId } = req.params;
+
+    const admin = await User.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+
+    if (admin.role !== 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'User is not a hall admin'
+      });
+    }
+
+    await User.findByIdAndDelete(adminId);
+
+    res.json({
+      success: true,
+      message: 'Hall admin deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting admin:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getAllAdmins,
   createHallAdmin,
   updateHallAdmin,
   deactivateAdmin,
-  reactivateAdmin
+  reactivateAdmin,
+  deleteHallAdmin
 };
