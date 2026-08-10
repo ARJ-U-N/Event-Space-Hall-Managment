@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs'); // Add this import
 const User = require('../models/User');
 
 // Get all hall admins (include both active and inactive)
@@ -39,15 +38,11 @@ const createHallAdmin = async (req, res) => {
       });
     }
 
-    // Hash password before saving
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Create admin user with hashed password
+    // Create admin user - password will be hashed by the User model's pre('save') hook
     const admin = await User.create({
       name: name.trim(),
       email: email.toLowerCase().trim(),
-      password: hashedPassword, // Use hashed password
+      password, // Plain-text; Mongoose pre('save') hook handles hashing
       role: 'admin',
       department: department ? department.trim() : '',
       phone: phone ? phone.trim() : '',
